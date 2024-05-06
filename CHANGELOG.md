@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.1.1
+
+- :bug: Use GeoJSON Feature Type
+
 ### v1.1.0
 
 - :tada: MVP Version with Typed Fetch
