@@ -1,6 +1,20 @@
 import ETL, { Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
+import { fetch } from '@tak-ps/etl';
+import moment from 'moment';
 import { FeatureCollection } from 'geojson';
-import { Type, TSchema } from '@sinclair/typebox';
+import { Type, Static, TSchema } from '@sinclair/typebox';
+
+const SkyMiraMessage = Type.Object({
+    MobileID: Type.String(),
+    vehicle_id: Type.String(),
+    vehicle_type: Type.String(),
+    agency: Type.String(),
+    device_type: Type.String(),
+    report_utc: Type.String(),
+    received_utc: Type.String(),
+    latitude: Type.Integer(),
+    longitude: Type.Integer()
+})
 
 export default class Task extends ETL {
     async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
@@ -10,8 +24,7 @@ export default class Task extends ETL {
                 'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
             });
         } else {
-            return Type.Object({
-            });
+            return SkyMiraMessage
         }
     }
 
@@ -20,10 +33,59 @@ export default class Task extends ETL {
 
         if (!layer.environment.SKYMIRA_TOKEN) throw new Error('No SkyMira API Token Provided');
 
+        const url = new URL('https://gpsgate.skymira.com/GPSClient/getforest_auth.php');
+        url.searchParams.append('start_utc', moment().subtract(1, 'minute').toISOString())
+
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${layer.environment.SKYMIRA_TOKEN}`
+            }
+        });
+
+        const body = await res.typed(Type.Object({
+            ErrorId: Type.String(),
+            NextStartUTC: Type.String(),
+            devices: Type.String(),
+            Messages: Type.Array(SkyMiraMessage)
+        }));
+
         const features: FeatureCollection = {
             type: 'FeatureCollection',
             features: []
         };
+
+        // The list is a raw list of udpates so group into most current
+        const agg: Map<string, Static<typeof SkyMiraMessage>> = new Map();
+        for (const msg of body.Messages) {
+            const current = agg.get(msg.MobileID);
+
+            if ((current && moment(current.report_utc).isAfter(msg.report_utc)) || !current)  {
+                agg.set(msg.MobileID, msg);
+            }
+        }
+
+        for (const msg of agg.values()) {
+            msg.longitude = msg.longitude / 60000;
+            msg.latitude = msg.latitude / 60000;
+
+            const feat = {
+                id: `symira-${msg.MobileID}`,
+                type: 'Feature',
+                properties: {
+                    callsign: msg.vehicle_id,
+                    time: msg.received_utc,
+                    start: msg.report_utc,
+                    metadata: msg
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: [ msg.longitude, msg.latitude ]
+                }
+            }
+
+            features.features.push(feat);
+        }
 
         await this.submit(features);
     }
