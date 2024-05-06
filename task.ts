@@ -1,7 +1,7 @@
 import ETL, { Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
 import { fetch } from '@tak-ps/etl';
 import moment from 'moment';
-import { FeatureCollection } from 'geojson';
+import { FeatureCollection, Feature } from 'geojson';
 import { Type, Static, TSchema } from '@sinclair/typebox';
 
 const SkyMiraMessage = Type.Object({
@@ -69,7 +69,7 @@ export default class Task extends ETL {
             msg.longitude = msg.longitude / 60000;
             msg.latitude = msg.latitude / 60000;
 
-            const feat = {
+            const feat: Feature = {
                 id: `symira-${msg.MobileID}`,
                 type: 'Feature',
                 properties: {
