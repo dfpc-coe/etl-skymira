@@ -45,15 +45,20 @@ export default class Task extends ETL {
 
         const body = await res.typed(Type.Object({
             ErrorId: Type.String(),
-            NextStartUTC: Type.String(),
+            NextStartUTC: Type.Union([Type.String(), Type.Integer()]),
             devices: Type.String(),
-            Messages: Type.Array(SkyMiraMessage)
+            Messages: Type.Union([Type.Array(SkyMiraMessage), Type.Null()])
         }));
 
         const features: FeatureCollection = {
             type: 'FeatureCollection',
             features: []
         };
+
+        if (body.Messages === null) {
+            console.error(JSON.stringify(body));
+            throw new Error('SkyMira did return successful response')
+        }
 
         // The list is a raw list of udpates so group into most current
         const agg: Map<string, Static<typeof SkyMiraMessage>> = new Map();

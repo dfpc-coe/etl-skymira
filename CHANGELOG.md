@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.2.0
+
+- :rocket: Explicitly handle `Messages: null`
+
 ### v1.1.1
 
 - :bug: Use GeoJSON Feature Type
