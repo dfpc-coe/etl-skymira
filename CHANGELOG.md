@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.2.1
+
+- :arrow_up: Update Internal Deps
+
 ### v1.2.0
 
 - :rocket: Explicitly handle `Messages: null`
