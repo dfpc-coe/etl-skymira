@@ -13,6 +13,7 @@
     "author": "Nick Ingalls <nick@ingalls.ca>",
     "license": "ISC",
     "devDependencies": {
+        "@types/geojson": "^7946.0.14",
         "eslint": "^8.57.0",
         "eslint-plugin-node": "^11.1.0",
         "typescript": "^5.4.5",
@@ -20,6 +21,7 @@
     },
     "dependencies": {
         "@sinclair/typebox": "^0.32.20",
-        "@tak-ps/etl": "^4.7.1"
+        "@tak-ps/etl": "^4.7.1",
+        "moment": "^2.30.1"
     }
 }

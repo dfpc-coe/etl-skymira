@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.4.0
+
+- :arrow_up: Update ETL Base lib to support date-time parsing
+
 ### v1.3.0
 
 - :rocket: Set date format

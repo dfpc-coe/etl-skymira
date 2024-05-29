@@ -10,8 +10,8 @@ const SkyMiraMessage = Type.Object({
     vehicle_type: Type.String(),
     agency: Type.String(),
     device_type: Type.String(),
-    report_utc: Type.String({ format: "date-time" }),
-    received_utc: Type.String({ format: "date-time" }),
+    report_utc: Type.String({ format: 'date-time' }),
+    received_utc: Type.String({ format: 'date-time' }),
     latitude: Type.Integer(),
     longitude: Type.Integer()
 })
