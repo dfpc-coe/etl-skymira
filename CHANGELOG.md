@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.3.0
+
+- :rocket: Set date format
+
 ### v1.2.1
 
 - :arrow_up: Update Internal Deps

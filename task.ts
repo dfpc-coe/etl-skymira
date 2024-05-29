@@ -10,8 +10,8 @@ const SkyMiraMessage = Type.Object({
     vehicle_type: Type.String(),
     agency: Type.String(),
     device_type: Type.String(),
-    report_utc: Type.String(),
-    received_utc: Type.String(),
+    report_utc: Type.String({ format: "date-time" }),
+    received_utc: Type.String({ format: "date-time" }),
     latitude: Type.Integer(),
     longitude: Type.Integer()
 })
@@ -49,6 +49,9 @@ export default class Task extends ETL {
             devices: Type.String(),
             Messages: Type.Union([Type.Array(SkyMiraMessage), Type.Null()])
         }));
+
+        console.error(url)
+        console.error(body);
 
         const features: FeatureCollection = {
             type: 'FeatureCollection',
