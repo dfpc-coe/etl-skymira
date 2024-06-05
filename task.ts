@@ -34,7 +34,7 @@ export default class Task extends ETL {
         if (!layer.environment.SKYMIRA_TOKEN) throw new Error('No SkyMira API Token Provided');
 
         const url = new URL('https://gpsgate.skymira.com/GPSClient/getforest_auth.php');
-        url.searchParams.append('start_utc', moment().subtract(1, 'minute').toISOString())
+        url.searchParams.append('start_utc', moment().subtract(10, 'minute').toISOString())
 
         const res = await fetch(url, {
             method: 'GET',

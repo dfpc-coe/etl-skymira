@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.5.0
+
+- :arrow_up: Longer backlog time
+
 ### v1.4.0
 
 - :arrow_up: Update ETL Base lib to support date-time parsing
