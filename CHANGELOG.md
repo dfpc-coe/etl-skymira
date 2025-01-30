@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.6.0
+
+- :tada: Add Capabilities API
+
 ### v1.5.0
 
 - :arrow_up: Longer backlog time

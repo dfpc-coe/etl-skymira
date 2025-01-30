@@ -1,7 +1,6 @@
-import ETL, { Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
+import ETL, { Event, SchemaType, handler as internal, local, DataFlowType, InvocationType, InputFeatureCollection, InputFeature } from '@tak-ps/etl';
 import { fetch } from '@tak-ps/etl';
 import moment from 'moment';
-import { FeatureCollection, Feature } from 'geojson';
 import { Type, Static, TSchema } from '@sinclair/typebox';
 
 const SkyMiraMessage = Type.Object({
@@ -17,14 +16,25 @@ const SkyMiraMessage = Type.Object({
 })
 
 export default class Task extends ETL {
-    async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
-        if (type === SchemaType.Input) {
-            return Type.Object({
-                'SKYMIRA_TOKEN': Type.String({ description: 'API Token for SkyMira API' }),
-                'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
-            });
+    static name = 'etl-skymira';
+    static flow = [ DataFlowType.Incoming ];
+    static invocation = [ InvocationType.Schedule ];
+
+    async schema(
+        type: SchemaType = SchemaType.Input,
+        flow: DataFlowType = DataFlowType.Incoming
+    ): Promise<TSchema> {
+        if (flow === DataFlowType.Incoming) {
+            if (type === SchemaType.Input) {
+                return Type.Object({
+                    'SKYMIRA_TOKEN': Type.String({ description: 'API Token for SkyMira API' }),
+                    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
+                });
+            } else {
+                return SkyMiraMessage
+            }
         } else {
-            return SkyMiraMessage
+            return Type.Object({});
         }
     }
 
@@ -53,7 +63,7 @@ export default class Task extends ETL {
         console.error(url)
         console.error(body);
 
-        const features: FeatureCollection = {
+        const features: Static<typeof InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: []
         };
@@ -77,7 +87,7 @@ export default class Task extends ETL {
             msg.longitude = msg.longitude / 60000;
             msg.latitude = msg.latitude / 60000;
 
-            const feat: Feature = {
+            const feat: Static<typeof InputFeature> = {
                 id: `symira-${msg.MobileID}`,
                 type: 'Feature',
                 properties: {
@@ -99,8 +109,7 @@ export default class Task extends ETL {
     }
 }
 
-env(import.meta.url)
-await local(new Task(), import.meta.url);
+await local(new Task(import.meta.url), import.meta.url);
 export async function handler(event: Event = {}) {
-    return await internal(new Task(), event);
+    return await internal(new Task(import.meta.url), event);
 }
