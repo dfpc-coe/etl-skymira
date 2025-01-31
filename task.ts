@@ -15,6 +15,11 @@ const SkyMiraMessage = Type.Object({
     longitude: Type.Integer()
 })
 
+const InputSchema = Type.Object({
+    'SKYMIRA_TOKEN': Type.String({ description: 'API Token for SkyMira API' }),
+    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
+});
+
 export default class Task extends ETL {
     static name = 'etl-skymira';
     static flow = [ DataFlowType.Incoming ];
@@ -26,10 +31,7 @@ export default class Task extends ETL {
     ): Promise<TSchema> {
         if (flow === DataFlowType.Incoming) {
             if (type === SchemaType.Input) {
-                return Type.Object({
-                    'SKYMIRA_TOKEN': Type.String({ description: 'API Token for SkyMira API' }),
-                    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
-                });
+                return InputSchema;
             } else {
                 return SkyMiraMessage
             }
@@ -39,9 +41,9 @@ export default class Task extends ETL {
     }
 
     async control() {
-        const layer = await this.fetchLayer();
+        const env = await this.env(InputSchema);
 
-        if (!layer.environment.SKYMIRA_TOKEN) throw new Error('No SkyMira API Token Provided');
+        if (!env.SKYMIRA_TOKEN) throw new Error('No SkyMira API Token Provided');
 
         const url = new URL('https://gpsgate.skymira.com/GPSClient/getforest_auth.php');
         url.searchParams.append('start_utc', moment().subtract(10, 'minute').toISOString())
@@ -49,7 +51,7 @@ export default class Task extends ETL {
         const res = await fetch(url, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${layer.environment.SKYMIRA_TOKEN}`
+                'Authorization': `Bearer ${env.SKYMIRA_TOKEN}`
             }
         });
 

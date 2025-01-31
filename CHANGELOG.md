@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.0.1
+
+- :bug: Fix TS Build Errors
+
 ### v2.0.0
 
 - :tada: Update to `CloudTAK@v6`
