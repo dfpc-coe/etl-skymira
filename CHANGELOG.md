@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.1.1
+
+- :rocket: Use init fn
+
 ### v2.1.0
 
 - :arrow_up: Update Core Deps
