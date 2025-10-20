@@ -1,4 +1,5 @@
-import ETL, { Event, SchemaType, handler as internal, local, DataFlowType, InvocationType, InputFeatureCollection, InputFeature } from '@tak-ps/etl';
+import ETL, { Event, SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
+import { Feature } from '@tak-ps/node-cot';
 import { fetch } from '@tak-ps/etl';
 import moment from 'moment';
 import { Type, Static, TSchema } from '@sinclair/typebox';
@@ -65,7 +66,7 @@ export default class Task extends ETL {
         console.error(url)
         console.error(body);
 
-        const features: Static<typeof InputFeatureCollection> = {
+        const features: Static<typeof Feature.InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: []
         };
@@ -89,7 +90,7 @@ export default class Task extends ETL {
             msg.longitude = msg.longitude / 60000;
             msg.latitude = msg.latitude / 60000;
 
-            const feat: Static<typeof InputFeature> = {
+            const feat: Static<typeof Feature.InputFeature> = {
                 id: `symira-${msg.MobileID}`,
                 type: 'Feature',
                 properties: {
