@@ -1,0 +1,27 @@
+{
+    "version": "1.0",
+    "name": "SkyMira",
+    "description": "Ingests satellite vehicle tracking messages from SkyMira and posts vehicle positions to the map.",
+    "compute": {
+        "memory": 512,
+        "timeout": 60
+    },
+    "permissions": [
+        {
+            "resource": "feature:*",
+            "required": true,
+            "description": "SkyMira posts satellite vehicle positions to the map"
+        }
+    ],
+    "invocations": {
+        "incoming": {
+            "schedule": {
+                "description": "Polls SkyMira for updated satellite tracking messages on a schedule.",
+                "default": {
+                    "enabled": true,
+                    "schedule": "rate(1 minute)"
+                }
+            }
+        }
+    }
+}
